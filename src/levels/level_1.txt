@@ -1,0 +1,11 @@
+X..........................X
+X..........................X
+X..........................X
+XXX....XXX............XX...X
+XXX.P......IE.I............X
+XXXXX.......XX...........XXX
+XXXXX.....TTXX...I.E...FI..X
+XXX....X..XXXXXX..XXXXXX...X
+X......X..XXXXXX..XX..XXX..X
+XXXXXXXX..XXXXXX..XX..XXXXXX
+LLLLLLLLLLLLLLLLLLLLLLLLLLLL
