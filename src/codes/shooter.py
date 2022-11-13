@@ -14,6 +14,7 @@ class Shooter(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=pos)
         self.rect.y += tile_size - self.image.get_size()[1]
         self.speed = 1
+        self.direction = 1
 
     def import_shooter_assets(self):
         shooter_path = 'src/sprites/shooter/'
@@ -44,9 +45,16 @@ class Shooter(pygame.sprite.Sprite):
     def reverse(self):
         self.speed *= -1
 
+    def determine_direction(self):
+        if self.speed > 0:
+            self.direction = 1
+        else:
+            self.direction = -1
+
     def update(self, shift):
         self.animate()
         self.move()
         self.reverse_image()
+        self.determine_direction()
 
         self.rect.x += shift

@@ -17,6 +17,7 @@ class Level:
 
         # level setup
         level_data = self.import_level()
+        self.shooter_objects = []
         self.setup_level(level_data)
         self.world_shift = 0
         self.current_x = 0
@@ -144,6 +145,7 @@ class Level:
                     self.enemies.add(enemy_sprite)
                 if cell == 'S':
                     shooter_sprite = Shooter((x, y), conf.tile_size)
+                    self.shooter_objects.append(shooter_sprite)
                     self.shooters.add(shooter_sprite)
                 if cell == 'I':
                     invisible_sprite = Tile((x, y), conf.tile_size)
@@ -265,10 +267,13 @@ class Level:
     def fire_bullets(self):
         curr_time = pygame.time.get_ticks() // 1000 % 3
         if curr_time == 1 and not self.triggered:
+            index = 0
             for shooter in self.shooters.sprites():
                 x = shooter.rect.x
                 y = shooter.rect.y
-                bullet_sprite = Bullet((x, y), conf.tile_size)
+                dir_ = self.shooter_objects[index].direction
+                index += 1
+                bullet_sprite = Bullet((x, y), conf.tile_size, dir_)
                 self.bullets.add(bullet_sprite)
             self.triggered = True
         elif curr_time == 2:
