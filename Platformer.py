@@ -62,23 +62,30 @@ class Game:
             clock.tick(60)
 
     def run_level(self, state):
-        self.level = Level(screen, state)
+        def run(state_):
+            self.level = Level(screen, state_)
+            running = True
+            while running:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    state_ = self.level.process_events(event)
+                    if state_ == 'exit':
+                        running = False
 
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                state = self.level.process_events(event)
-                if state == 'exit':
-                    running = False
+                is_restart_ = self.level.run()
+                if is_restart_:
+                    return True
 
-            self.level.run()
+                pygame.display.flip()
+                screen.fill(conf.RED)
+                clock.tick(60)
 
-            pygame.display.flip()
-            screen.fill(conf.RED)
-            clock.tick(60)
+        # Restart level logic
+        is_restart = True
+        while is_restart:
+            is_restart = run(state)
 
 
 if __name__ == '__main__':

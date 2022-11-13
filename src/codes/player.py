@@ -5,10 +5,10 @@ from src.codes.tools import import_folder
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, surface, create_jump_particles):
         super().__init__()
-        self.import_character_assets()
+        self.import_player_assets()
         self.frame_index = 0
         self.animation_speed = 0.15
-        self.image = self.animations['idle'][self.frame_index]
+        self.image = self.animations['run'][self.frame_index]
         self.rect = self.image.get_rect(topleft=pos)
 
         # dust particles
@@ -25,19 +25,19 @@ class Player(pygame.sprite.Sprite):
         self.jump_speed = -16
 
         # player status
-        self.status = 'idle'
+        self.status = 'run'
         self.facing_right = True
         self.on_ground = False
         self.on_ceiling = False
         self.on_left = False
         self.on_right = False
 
-    def import_character_assets(self):
-        character_path = 'src/sprites/player/'
+    def import_player_assets(self):
+        player_path = 'src/sprites/player/'
         self.animations = {'idle': [], 'run': [], 'jump': [], 'fall': []}
 
         for animation in self.animations.keys():
-            full_path = character_path + animation
+            full_path = player_path + animation
             self.animations[animation] = import_folder(full_path)
 
     def import_dust_run_particles(self):
@@ -113,7 +113,7 @@ class Player(pygame.sprite.Sprite):
             if self.direction.x != 0:
                 self.status = 'run'
             else:
-                self.status = 'idle'
+                self.status = 'run'
 
     def apply_gravity(self):
         self.direction.y += self.gravity
