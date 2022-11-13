@@ -2,10 +2,10 @@ X..........................X
 X..........................X
 X..........................X
 X...............I...S...I..X
-XXX....XXX...... XXXXXXX...X
+XXX....XXX.......XXXXXXX...X
 XXX.P......IE.I............X
 XXXXX.......XX...........XXX
-X.........TTXX...I.E.S.FI..X
+X.........TTXX...I.E.S..I..X
 X......X..XXXXXX..XXXXXX...X
-XTTT...X..XXXXXX..XX..XXX..X
+XTTT...X..XXXXXX..XX..XXX.FX
 XXXXXXXX..XXXXXX..XX..XXXXXX
