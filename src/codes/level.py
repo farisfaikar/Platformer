@@ -2,7 +2,9 @@ import pygame
 import src.codes.config as conf
 from src.codes.tile import Tile
 from src.codes.player import Player
-from src.codes.enemy import Enemy, Shooter
+from src.codes.enemy import Enemy
+from src.codes.shooter import Shooter
+from src.codes.bullet import Bullet
 from src.codes.trap import Trap
 from src.codes.particles import ParticleEffect
 
@@ -26,6 +28,9 @@ class Level:
         # player spawn pos
         self.spawn_pos = ()
 
+        self.bullets = pygame.sprite.Group()
+        self.static_time = 0
+        self.triggered = False
         self.is_restart = False
 
     def process_events(self, event):
@@ -69,6 +74,11 @@ class Level:
         self.check_shooter_collisions()
         self.shooter_collision_reverse()
         self.shooters.draw(self.display_surface)
+
+        # bullet
+        self.fire_bullets()
+        self.bullets.update(self.world_shift)
+        self.bullets.draw(self.display_surface)
 
         # invisible
         self.invisibles.update(self.world_shift)
@@ -251,3 +261,15 @@ class Level:
         for shooter in self.shooters.sprites():
             if pygame.sprite.spritecollide(shooter, self.invisibles, False):
                 shooter.reverse()
+
+    def fire_bullets(self):
+        curr_time = pygame.time.get_ticks() // 1000 % 3
+        if curr_time == 1 and not self.triggered:
+            for shooter in self.shooters.sprites():
+                x = shooter.rect.x
+                y = shooter.rect.y
+                bullet_sprite = Bullet((x, y), conf.tile_size)
+                self.bullets.add(bullet_sprite)
+            self.triggered = True
+        elif curr_time == 2:
+            self.triggered = False

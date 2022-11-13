@@ -2,23 +2,24 @@ import pygame
 from src.codes.tools import import_folder
 
 
-class Enemy(pygame.sprite.Sprite):
+class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos, tile_size):
         super().__init__()
-        self.import_enemy_assets()
+        self.import_bullet_assets()
         self.frame_index = 0
         self.animation_speed = 0.15
+
         self.image = self.animations['run'][self.frame_index]
         self.rect = self.image.get_rect(topleft=pos)
         self.rect.y += tile_size - self.image.get_size()[1]
-        self.speed = 1
+        self.speed = 3
 
-    def import_enemy_assets(self):
-        enemy_path = 'src/sprites/enemy/'
+    def import_bullet_assets(self):
+        bullet_path = 'src/sprites/bullet/'
         self.animations = {'run': []}
 
         for animation in self.animations.keys():
-            full_path = enemy_path + animation
+            full_path = bullet_path + animation
             self.animations[animation] = import_folder(full_path)
 
     def animate(self):
@@ -45,6 +46,6 @@ class Enemy(pygame.sprite.Sprite):
     def update(self, shift):
         self.animate()
         self.move()
-        self.reverse_image()
+        # self.reverse_image()  # TODO: minor - figure out enemy flip
 
         self.rect.x += shift

@@ -2,23 +2,25 @@ import pygame
 from src.codes.tools import import_folder
 
 
-class Enemy(pygame.sprite.Sprite):
+class Shooter(pygame.sprite.Sprite):
     def __init__(self, pos, tile_size):
         super().__init__()
-        self.import_enemy_assets()
+        self.import_shooter_assets()
         self.frame_index = 0
         self.animation_speed = 0.15
+
+        # shooter attribute
         self.image = self.animations['run'][self.frame_index]
         self.rect = self.image.get_rect(topleft=pos)
         self.rect.y += tile_size - self.image.get_size()[1]
         self.speed = 1
 
-    def import_enemy_assets(self):
-        enemy_path = 'src/sprites/enemy/'
+    def import_shooter_assets(self):
+        shooter_path = 'src/sprites/shooter/'
         self.animations = {'run': []}
 
         for animation in self.animations.keys():
-            full_path = enemy_path + animation
+            full_path = shooter_path + animation
             self.animations[animation] = import_folder(full_path)
 
     def animate(self):
