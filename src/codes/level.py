@@ -99,15 +99,15 @@ class Level:
             self.dust_sprite.add(fall_dust_particle)
 
     def import_level(self):
+        # converts level .txt file into python list
         path = f"src/levels/{self.level_num}.txt"
         with open(path) as file:
-            data = file.readlines()
-        f_data = []
-        for _, line in enumerate(data):
-            f_data.append(line.rstrip())
-        return f_data
+            # removes the "\n" at the end of each line
+            data = [line.rstrip() for line in file]
+        return data
 
     def scroll_x(self):
+        # scrolls the world horizontally
         player = self.player.sprite
         player_x = player.rect.centerx
         direction_x = player.direction.x
@@ -123,6 +123,7 @@ class Level:
             player.speed = 8
 
     def horizontal_movement_collision(self):
+        # tile collision with player from side-to-side
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
 
@@ -143,6 +144,7 @@ class Level:
             player.on_right = False
 
     def vertical_movement_collision(self):
+        # platform collision logic
         player = self.player.sprite
         player.apply_gravity()
 
@@ -163,6 +165,7 @@ class Level:
             player.on_ceiling = False
 
     def check_enemy_collisions(self):
+        # level restarts if player hits enemy from the side
         player = self.player.sprite
 
         for enemy in self.enemies.sprites():
@@ -179,6 +182,7 @@ class Level:
                     self.status = 'restart'
 
     def check_shooter_collisions(self):
+        # level restarts if player hits shooter from the side
         player = self.player.sprite
 
         for shooter in self.shooters.sprites():
@@ -195,6 +199,7 @@ class Level:
                     self.status = 'restart'
 
     def check_trap_collisions(self):
+        # level restarts if player hits trap
         player = self.player.sprite
 
         for trap in self.traps.sprites():
@@ -202,20 +207,24 @@ class Level:
                 self.status = 'restart'
 
     def check_death(self):
+        # level restarts if player goes below screen_height
         if self.player.sprite.rect.top > conf.screen_height:
             self.status = 'restart'
 
     def enemy_collision_reverse(self):
+        # reverse enemy direction when colliding with invisible
         for enemy in self.enemies.sprites():
             if pygame.sprite.spritecollide(enemy, self.invisibles, False):
                 enemy.reverse()
 
     def shooter_collision_reverse(self):
+        # reverse shooter direction when colliding with invisible
         for shooter in self.shooters.sprites():
             if pygame.sprite.spritecollide(shooter, self.invisibles, False):
                 shooter.reverse()
 
     def fire_bullets(self):
+        # fire bullets between 3 seconds intervals
         curr_time = pygame.time.get_ticks() // 1000 % 3
         if curr_time == 1 and not self.triggered:
             for shooter in self.shooters.sprites():

@@ -1,7 +1,7 @@
 import pygame
 
 # ----------- Global Variables -----------
-# Screen dimension
+# Screen Dimension
 vertical_tile_number = 11
 tile_size = 64
 screen_height = vertical_tile_number * tile_size
