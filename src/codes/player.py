@@ -113,7 +113,7 @@ class Player(pygame.sprite.Sprite):
             if self.direction.x != 0:
                 self.status = 'run'
             else:
-                self.status = 'run'
+                self.status = 'idle'
 
     def apply_gravity(self):
         self.direction.y += self.gravity

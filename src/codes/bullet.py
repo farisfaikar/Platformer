@@ -46,6 +46,5 @@ class Bullet(pygame.sprite.Sprite):
     def update(self, shift):
         self.animate()
         self.move()
-        # self.reverse_image()  # TODO: minor - figure out enemy flip
 
         self.rect.x += shift

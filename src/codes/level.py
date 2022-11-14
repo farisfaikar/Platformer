@@ -6,13 +6,14 @@ from src.codes.enemy import Enemy
 from src.codes.shooter import Shooter
 from src.codes.bullet import Bullet
 from src.codes.trap import Trap
+from src.codes.finish import Finish
 from src.codes.particles import ParticleEffect
 
 
 class Level:
-    def __init__(self, screen, state):
+    def __init__(self, screen, num):
         self.display_surface = screen
-        self.level_num = state
+        self.level_num = f"level_{num}"
         self.font = pygame.font.Font(conf.chary_font, 20)
 
         # level setup
@@ -25,13 +26,13 @@ class Level:
         self.dust_sprite = pygame.sprite.GroupSingle()
         self.player_on_ground = False
 
-        # player spawn pos
-        self.spawn_pos = ()
+        # explosion
+        self.explosion_sprites = pygame.sprite.Group()
 
         self.bullets = pygame.sprite.Group()
         self.static_time = 0
         self.triggered = False
-        self.is_restart = False
+        self.status = 'running'
 
     def process_events(self, event):
         if event.type == pygame.KEYDOWN:
@@ -39,54 +40,6 @@ class Level:
             if keys[pygame.K_ESCAPE]:
                 return 'exit'
         return ''
-
-    def run(self):
-        # dust particles
-        self.dust_sprite.update(self.world_shift)
-        self.dust_sprite.draw(self.display_surface)
-
-        # trap
-        self.traps.update(self.world_shift)
-        self.check_trap_collisions()
-        self.traps.draw(self.display_surface)
-
-        # level tiles
-        self.tiles.update(self.world_shift)
-        self.tiles.draw(self.display_surface)
-        self.scroll_x()
-
-        # player
-        self.player.update()
-        self.horizontal_movement_collision()
-        self.get_player_on_ground()
-        self.vertical_movement_collision()
-        self.create_landing_dust()
-        self.player.draw(self.display_surface)
-
-        # enemy
-        self.enemies.update(self.world_shift)
-        self.check_enemy_collisions()
-        self.enemy_collision_reverse()
-        self.enemies.draw(self.display_surface)
-
-        # shooter
-        self.shooters.update(self.world_shift)
-        self.check_shooter_collisions()
-        self.shooter_collision_reverse()
-        self.shooters.draw(self.display_surface)
-
-        # bullet
-        self.fire_bullets()
-        self.bullets.update(self.world_shift)
-        self.check_bullet_collisions()
-        self.bullets.draw(self.display_surface)
-
-        # invisible
-        self.invisibles.update(self.world_shift)
-
-        # check death
-        self.check_death()
-        return True if self.is_restart else False
 
     def create_jump_particles(self, pos):
         if self.player.sprite.facing_right:
@@ -127,6 +80,7 @@ class Level:
         self.shooters = pygame.sprite.Group()
         self.invisibles = pygame.sprite.Group()
         self.traps = pygame.sprite.Group()
+        self.finish = pygame.sprite.GroupSingle()
 
         for row_index, row in enumerate(layout):
             for col_index, cell in enumerate(row):
@@ -137,7 +91,6 @@ class Level:
                     tile = Tile((x, y), conf.tile_size)
                     self.tiles.add(tile)
                 if cell == 'P':
-                    self.spawn_pos = (x, y)
                     player_sprite = Player((x, y), self.display_surface, self.create_jump_particles)
                     self.player.add(player_sprite)
                 if cell == 'E':
@@ -152,12 +105,9 @@ class Level:
                 if cell == 'T':
                     trap_sprite = Trap((x, y), conf.tile_size)
                     self.traps.add(trap_sprite)
-                if cell == 'L':
-                    # Place lava tile
-                    pass
                 if cell == 'F':
-                    # trigger next level
-                    pass
+                    finish_sprite = Finish((x, y), conf.tile_size)
+                    self.finish.add(finish_sprite)
 
     def scroll_x(self):
         player = self.player.sprite
@@ -224,9 +174,11 @@ class Level:
                 player_bottom = self.player.sprite.rect.bottom
                 if enemy_top < player_bottom < enemy_center and player.direction.y >= 0:
                     player.direction.y = -15
+                    explosion_sprite = ParticleEffect(enemy.rect.center, 'explosion')
+                    self.explosion_sprites.add(explosion_sprite)
                     enemy.kill()
                 else:
-                    self.is_restart = True
+                    self.status = 'restart'
 
     def check_shooter_collisions(self):
         player = self.player.sprite
@@ -238,20 +190,22 @@ class Level:
                 player_bottom = self.player.sprite.rect.bottom
                 if shooter_top < player_bottom < shooter_center and player.direction.y >= 0:
                     player.direction.y = -15
+                    explosion_sprite = ParticleEffect(shooter.rect.center, 'explosion')
+                    self.explosion_sprites.add(explosion_sprite)
                     shooter.kill()
                 else:
-                    self.is_restart = True
+                    self.status = 'restart'
 
     def check_trap_collisions(self):
         player = self.player.sprite
 
         for trap in self.traps.sprites():
             if trap.rect.colliderect(player.rect):
-                self.is_restart = True
+                self.status = 'restart'
 
     def check_death(self):
         if self.player.sprite.rect.top > conf.screen_height:
-            self.is_restart = True
+            self.status = 'restart'
 
     def enemy_collision_reverse(self):
         for enemy in self.enemies.sprites():
@@ -280,4 +234,66 @@ class Level:
         player = self.player.sprite
         for bullet in self.bullets.sprites():
             if bullet.rect.colliderect(player.rect):
-                self.is_restart = True
+                self.status = 'restart'
+
+    def check_finish(self):
+        player = self.player.sprite
+
+        if self.finish.sprite.rect.colliderect(player.rect):
+            self.status = 'finished'
+
+    def run(self):
+        # dust particles
+        self.dust_sprite.update(self.world_shift)
+        self.dust_sprite.draw(self.display_surface)
+
+        # trap
+        self.traps.update(self.world_shift)
+        self.check_trap_collisions()
+        self.traps.draw(self.display_surface)
+
+        # finish
+        self.finish.update(self.world_shift)
+        self.check_finish()
+        self.finish.draw(self.display_surface)
+
+        # level tiles
+        self.tiles.update(self.world_shift)
+        self.tiles.draw(self.display_surface)
+        self.scroll_x()
+
+        # player
+        self.player.update()
+        self.horizontal_movement_collision()
+        self.get_player_on_ground()
+        self.vertical_movement_collision()
+        self.create_landing_dust()
+        self.player.draw(self.display_surface)
+
+        # enemy
+        self.enemies.update(self.world_shift)
+        self.check_enemy_collisions()
+        self.enemies.draw(self.display_surface)
+        self.explosion_sprites.update(self.world_shift)
+        self.explosion_sprites.draw(self.display_surface)
+
+        # shooter
+        self.shooters.update(self.world_shift)
+        self.check_shooter_collisions()
+        self.shooters.draw(self.display_surface)
+
+        # bullet
+        self.fire_bullets()
+        self.bullets.update(self.world_shift)
+        self.check_bullet_collisions()
+        self.bullets.draw(self.display_surface)
+
+        # invisible
+        self.invisibles.update(self.world_shift)
+        self.shooter_collision_reverse()
+        self.enemy_collision_reverse()
+
+        # check death
+        self.check_death()
+
+        return self.status

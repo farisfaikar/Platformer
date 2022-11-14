@@ -38,7 +38,7 @@ class Tile(pygame.sprite.Sprite):
 
 class AnimatedTile(Tile):
     def __init__(self, size, x, y, path):
-        super().__init__(size, x)  # TODO: sort out this weird super() not accepting y variable
+        super().__init__(size, x)
         self.frames = import_folder(path)
         self.frame_index = 0
         self.image = self.frames[self.frame_index]
