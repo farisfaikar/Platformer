@@ -1,24 +1,15 @@
 import pygame
-from src.codes.tools import import_folder
+from src.codes.tools import import_assets
 
 
 class Tile(pygame.sprite.Sprite):
     def __init__(self, pos, tile_size):
         super().__init__()
-        self.import_tile_assets()
+        self.animations = import_assets('src/sprites/tile/', {'idle': []})
         self.frame_index = 0
         self.animation_speed = 0.15
         self.image = self.animations['idle'][self.frame_index]
         self.rect = self.image.get_rect(topleft=pos)
-        self.rect.y += tile_size - self.image.get_size()[1]
-
-    def import_tile_assets(self):
-        tile_path = 'src/sprites/tile/'
-        self.animations = {'idle': []}
-
-        for animation in self.animations.keys():
-            full_path = tile_path + animation
-            self.animations[animation] = import_folder(full_path)
 
     def animate(self):
         animation = self.animations['idle']
@@ -34,21 +25,3 @@ class Tile(pygame.sprite.Sprite):
     def update(self, x_shift):
         self.animate()
         self.rect.x += x_shift
-
-
-class AnimatedTile(Tile):
-    def __init__(self, size, x, y, path):
-        super().__init__(size, x)
-        self.frames = import_folder(path)
-        self.frame_index = 0
-        self.image = self.frames[self.frame_index]
-
-    def animate(self):
-        self.frame_index += 0.15
-        if self.frame_index >= len(self.frames):
-            self.frame_index = 0
-        self.image = self.frames[int(self.frame_index)]
-
-    def update(self, shift):
-        self.animate()
-        self.rect.x += shift

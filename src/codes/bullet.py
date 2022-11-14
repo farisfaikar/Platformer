@@ -1,26 +1,23 @@
 import pygame
-from src.codes.tools import import_folder
+from src.codes.tools import import_assets
 
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, pos, tile_size, direction):
         super().__init__()
-        self.import_bullet_assets()
+        self.animations = import_assets('src/sprites/bullet/', {'run': []})
         self.frame_index = 0
         self.animation_speed = 0.15
 
         self.image = self.animations['run'][self.frame_index]
+
+        # align bullet y position
+        x, y = pos
+        pos = (x, y - 18)
+
         self.rect = self.image.get_rect(topleft=pos)
-        self.rect.y += tile_size - self.image.get_size()[1]
+        self.rect.y -= tile_size - self.image.get_size()[1]
         self.speed = 3 * direction
-
-    def import_bullet_assets(self):
-        bullet_path = 'src/sprites/bullet/'
-        self.animations = {'run': []}
-
-        for animation in self.animations.keys():
-            full_path = bullet_path + animation
-            self.animations[animation] = import_folder(full_path)
 
     def animate(self):
         animation = self.animations['run']

@@ -16,9 +16,13 @@ class LevelSelect:
         pad = 10
         inner_rect = pygame.Rect((center_x, y), (width, height))
         outer_rect = pygame.Rect((center_x - pad, y - pad), (width + pad * 2, height + pad * 2))
+
+        # change color when highlighted
         if index == self.index:
             color = conf.PINK
             pygame.draw.rect(self.display_screen, conf.PINK, outer_rect)
+
+        # draw elements
         pygame.draw.rect(self.display_screen, conf.LAVANDER, inner_rect)
         text_surf = self.font.render(text, True, color)
         text_rect = text_surf.get_rect(center=inner_rect.center)
@@ -46,7 +50,7 @@ class LevelSelect:
                 self.index += 1
             elif keys[pygame.K_ESCAPE]:
                 return -1
-        self.index %= 6
+        self.index %= 6  # restricts index to 0-5
         return 0
 
     def run(self):

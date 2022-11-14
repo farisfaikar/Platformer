@@ -1,18 +1,19 @@
 import pygame
 from src.codes.tools import import_folder
+from src.codes.tools import import_assets
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, surface, create_jump_particles):
         super().__init__()
-        self.import_player_assets()
+        self.animations = import_assets('src/sprites/player/', {'idle': [], 'run': [], 'jump': [], 'fall': []})
         self.frame_index = 0
         self.animation_speed = 0.15
         self.image = self.animations['run'][self.frame_index]
         self.rect = self.image.get_rect(topleft=pos)
 
         # dust particles
-        self.import_dust_run_particles()
+        self.dust_run_particles = import_folder('src/sprites/player/dust_particles/run')
         self.dust_frame_index = 0
         self.dust_animation_speed = 0.15
         self.display_surface = surface
@@ -31,17 +32,6 @@ class Player(pygame.sprite.Sprite):
         self.on_ceiling = False
         self.on_left = False
         self.on_right = False
-
-    def import_player_assets(self):
-        player_path = 'src/sprites/player/'
-        self.animations = {'idle': [], 'run': [], 'jump': [], 'fall': []}
-
-        for animation in self.animations.keys():
-            full_path = player_path + animation
-            self.animations[animation] = import_folder(full_path)
-
-    def import_dust_run_particles(self):
-        self.dust_run_particles = import_folder('src/sprites/player/dust_particles/run')
 
     def animate(self):
         animation = self.animations[self.status]

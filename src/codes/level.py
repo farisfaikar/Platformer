@@ -17,63 +17,7 @@ class Level:
         self.font = pygame.font.Font(conf.chary_font, 20)
 
         # level setup
-        level_data = self.import_level()
-        self.setup_level(level_data)
-        self.world_shift = 0
-        self.current_x = 0
-
-        # dust
-        self.dust_sprite = pygame.sprite.GroupSingle()
-        self.player_on_ground = False
-
-        # explosion
-        self.explosion_sprites = pygame.sprite.Group()
-
-        self.bullets = pygame.sprite.Group()
-        self.static_time = 0
-        self.triggered = False
-        self.status = 'running'
-
-    def process_events(self, event):
-        if event.type == pygame.KEYDOWN:
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_ESCAPE]:
-                return 'exit'
-        return ''
-
-    def create_jump_particles(self, pos):
-        if self.player.sprite.facing_right:
-            pos -= pygame.math.Vector2(10, 5)
-        else:
-            pos += pygame.math.Vector2(10, -5)
-        jump_particle_sprite = ParticleEffect(pos, 'jump')
-        self.dust_sprite.add(jump_particle_sprite)
-
-    def get_player_on_ground(self):
-        if self.player.sprite.on_ground:
-            self.player_on_ground = True
-        else:
-            self.player_on_ground = False
-
-    def create_landing_dust(self):
-        if not self.player_on_ground and self.player.sprite.on_ground and not self.dust_sprite.sprites():
-            if self.player.sprite.facing_right:
-                offset = pygame.math.Vector2(10, 15)
-            else:
-                offset = pygame.math.Vector2(-10, 15)
-            fall_dust_particle = ParticleEffect(self.player.sprite.rect.midbottom - offset, 'land')
-            self.dust_sprite.add(fall_dust_particle)
-
-    def import_level(self):
-        path = f"src/levels/{self.level_num}.txt"
-        with open(path) as file:
-            data = file.readlines()
-        f_data = []
-        for _, line in enumerate(data):
-            f_data.append(line.rstrip())
-        return f_data
-
-    def setup_level(self, layout):
+        layout = self.import_level()
         self.tiles = pygame.sprite.Group()
         self.player = pygame.sprite.GroupSingle()
         self.enemies = pygame.sprite.Group()
@@ -108,6 +52,60 @@ class Level:
                 if cell == 'F':
                     finish_sprite = Finish((x, y), conf.tile_size)
                     self.finish.add(finish_sprite)
+
+        self.world_shift = 0
+        self.current_x = 0
+
+        # dust
+        self.dust_sprite = pygame.sprite.GroupSingle()
+        self.player_on_ground = False
+
+        # explosion
+        self.explosion_sprites = pygame.sprite.Group()
+
+        self.bullets = pygame.sprite.Group()
+        self.static_time = 0
+        self.triggered = False
+        self.status = 'running'
+
+    def process_events(self, event):
+        if event.type == pygame.KEYDOWN:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_ESCAPE]:
+                return -1
+        return 0
+
+    def create_jump_particles(self, pos):
+        if self.player.sprite.facing_right:
+            pos -= pygame.math.Vector2(10, 5)
+        else:
+            pos += pygame.math.Vector2(10, -5)
+        jump_particle_sprite = ParticleEffect(pos, 'jump')
+        self.dust_sprite.add(jump_particle_sprite)
+
+    def get_player_on_ground(self):
+        if self.player.sprite.on_ground:
+            self.player_on_ground = True
+        else:
+            self.player_on_ground = False
+
+    def create_landing_dust(self):
+        if not self.player_on_ground and self.player.sprite.on_ground and not self.dust_sprite.sprites():
+            if self.player.sprite.facing_right:
+                offset = pygame.math.Vector2(10, 15)
+            else:
+                offset = pygame.math.Vector2(-10, 15)
+            fall_dust_particle = ParticleEffect(self.player.sprite.rect.midbottom - offset, 'land')
+            self.dust_sprite.add(fall_dust_particle)
+
+    def import_level(self):
+        path = f"src/levels/{self.level_num}.txt"
+        with open(path) as file:
+            data = file.readlines()
+        f_data = []
+        for _, line in enumerate(data):
+            f_data.append(line.rstrip())
+        return f_data
 
     def scroll_x(self):
         player = self.player.sprite

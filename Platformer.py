@@ -71,18 +71,18 @@ class Game:
 
     def run_level(self, level_num):
         def run(level_num_):
-            self.level = Level(screen, level_num_)
+            level = Level(screen, level_num_)
             running = True
             while running:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit()
-                    state_ = self.level.process_events(event)
-                    if state_ == 'exit':
+                    state_ = level.process_events(event)
+                    if state_ == -1:
                         running = False
 
-                status_ = self.level.run()
+                status_ = level.run()
                 self.crt.draw()
 
                 if status_ == 'restart' or status_ == 'finished':
