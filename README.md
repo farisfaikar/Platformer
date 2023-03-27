@@ -1,5 +1,15 @@
-# PLATFORMER!
+# Platformer
 A platformer game with enemies, shooting enemies, traps, levels, and more!
+
+## ✨ Demo
+
+Preview of the game:
+
+
+
+https://user-images.githubusercontent.com/87220004/227816726-96b58f11-b7a9-409c-a94a-2fb87239a5e1.mp4
+
+
 
 ### Install the requirements
 Use the package manager [pip](https://pypi.org/project/pip/) to install pygame.
